@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // couchDB ................
 
-var db = require('nano')('https://thulasi.iriscouch.com/samsung_users');
+var db = require('nano')('http://thulasi:thulasi@thulasi.iriscouch.com/samsung_users');
 //nano.db.create('books');
 //var thulasi = nano.db.use('thulasi');
 
@@ -28,7 +28,7 @@ app.post('/register',function(req,res){
   db.insert(req.body,function(err,user){
     if (err) {console.log(error)};
     if (user) {console.log(user); res.send(user);};
-  })
+  });
       // db.destroy({'name':'thulasi'},  function(err, body) {
       //   if (!err)
       //     console.log(body);
@@ -43,13 +43,65 @@ app.get('/list',function(req,res){
         //     //     });
         // })
       
-       db.get('f5752c24dd05e33d55da85cce9002c81', function(err, body) {
-            if (!err)
-              console.log(body.apple_users);
-            res.send(body.htc_user);
+       db.get('thulasi@gmail.com', function(err, body) {
+            if (!err){
+              console.log(body);
+              res.send(body.name);
+            }
+            
       });
 
 });
+
+app.get('/login',function(req,res){
+  res.sendfile('public/views/login.html');
+});
+
+app.post('/login',function(req,res){
+  console.log(req.body);
+
+    db.get(req.body.username,function(err,body){
+      if (err) {throw err};
+        res.send(body);
+    });
+
+});
+
+app.get('/fulldata',function(req,res){
+      //   db.view('/_design/users/_view/byname',{key: "thulasig7@gmal.com"}, function (err, resp) {
+      //     if (!err) {throw err;};
+      //     if (resp) {console.log(resp)};
+      // });
+      db.view('users', 'byname', function(err, body) {
+                if (!err) {
+                  res.send(body);
+                  // body.rows.forEach(function(doc) {
+                  //   //console.log(doc.value);
+                  //   res.JsonStrignify(doc)
+                  // });
+            }
+          });
+});
+
+
+
+// { db: 
+ //  { create: [Function: create_db],
+ //    get: [Function: get_db],
+ //    destroy: [Function: destroy_db],
+ //    list: [Function: list_dbs],
+ //    use: [Function: document_module],
+ //    scope: [Function: document_module],
+ //    compact: [Function: compact_db],
+ //    replicate: [Function: replicate_db],
+ //    changes: [Function: changes_db] },
+ // use: [Function: document_module],
+ // scope: [Function: document_module],
+ // request: [Function: relax],
+ // config: { url: 'http://localhost:5984' },
+ // relax: [Function: relax],
+ // dinosaur: [Function: relax] }
+
 
 //Get a list of all books
 // thulasi.get(function(err, body){
